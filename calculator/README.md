@@ -1,70 +1,64 @@
-# Calculator
+version:
 
-This is a simple calculator program written in Python that allows users to perform basic arithmetic operations: addition, subtraction, multiplication, and division. The program features a user-friendly interface and supports continuous calculations until the user decides to stop.
+markdown
 
-## Features
+# PowerShell Script for Creating a Scheduled Task
 
-- Perform addition, subtraction, multiplication, and division
-- Continuously calculate using the result of the previous operation
-- Clear and intuitive user interface
+## Overview
 
-## Installation
+This PowerShell script is designed to create a scheduled task in Windows that runs a specified PowerShell script weekly. The scheduled task will execute a script located at `C:\Users\mollo\OneDrive\Documents\Scripts\WindowsUpdates.ps1` every Sunday at 10:00 AM.
 
-To run the calculator, ensure you have Python installed on your machine. You can download it from [python.org](https://www.python.org/downloads/).
+## Script Breakdown
 
-1. Clone this repository or download the code files.
-2. Navigate to the project directory.
-3. Install the required libraries (if any) using pip:
+### 1. Define the Action
 
-   ```bash
-   pip install art
+```powershell
+$Action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-File C:\Users\mollo\OneDrive\Documents\Scripts\WindowsUpdates.ps1'
 
-Usage
+    New-ScheduledTaskAction: This cmdlet creates an action for the scheduled task.
+    -Execute: Specifies the program to run (in this case, PowerShell.exe).
+    -Argument: Indicates the PowerShell script to be executed using -File followed by the script's full path.
 
-    Open a terminal or command prompt.
+2. Define the Trigger
 
-    Navigate to the directory containing the calculator.py file.
+powershell
 
-    Run the script:
+$Trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Sunday -At 10:00AM
 
-    bash
+    New-ScheduledTaskTrigger: This cmdlet creates a trigger that specifies when the task should run.
+    -Weekly: Indicates that the task will run on a weekly basis.
+    -DaysOfWeek: Specifies the day(s) the task will run (in this case, Sunday).
+    -At: Sets the exact time for the task to execute (10:00 AM).
 
-    python calculator.py
+3. Define the Settings
 
-    Follow the on-screen prompts to perform calculations.
+powershell
 
-Example
+$Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable
 
-When prompted, you can enter the first number, select an operation (e.g., +, -, *, /), and then enter the second number. The program will display the result and ask if you'd like to continue with that result or start a new calculation.
+    New-ScheduledTaskSettingsSet: Configures settings for the scheduled task.
+    -AllowStartIfOnBatteries: The task can start even if the system is on battery power.
+    -DontStopIfGoingOnBatteries: The task will continue running if the system switches to battery power.
+    -StartWhenAvailable: If the scheduled time is missed (e.g., the computer was off), the task will start as soon as possible.
 
-python
+4. Combine Action, Trigger, and Settings
 
-What is the first number?: 5
-+
--
-*
-/
-Select an operation: +
-What is the next number?: 3
-5.0 + 3.0 = 8.0
-Type 'y' to continue calculating with 8.0, or type 'n' to start a new calculation: n
+powershell
 
-Functions
+$Task = New-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings
 
-    add(n1, n2): Returns the sum of n1 and n2.
-    subtract(n1, n2): Returns the difference when n2 is subtracted from n1.
-    multiply(n1, n2): Returns the product of n1 and n2.
-    divide(n1, n2): Returns the quotient of n1 divided by n2.
+    New-ScheduledTask: Combines the previously defined action, trigger, and settings into a single task object.
 
-Contributing
+5. Register the Scheduled Task
 
-Contributions are welcome! If you have suggestions for improvements or new features, please fork the repository and create a pull request.
-License
+powershell
 
-This project is open-source and available under the MIT License.
+Register-ScheduledTask -TaskName 'Weekly Windows Updates' -InputObject $Task
 
-vbnet
+    Register-ScheduledTask: Registers the new scheduled task in the Task Scheduler.
+    -TaskName: Specifies the name of the scheduled task ("Weekly Windows Updates").
+    -InputObject: Passes the task object created earlier to register it with the Task Scheduler.
 
+Conclusion
 
-Feel free to modify any sections to better fit your project's needs! If you have any other requests or need further adjustments, let me know.
-
+This PowerShell script automates the process of creating a scheduled task that runs a specified script weekly. By using various cmdlets, the script sets up an action, a trigger, and appropriate settings, ensuring that the task runs reliably under specified conditions.
